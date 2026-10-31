@@ -1,4 +1,3 @@
-
 package com.lifelink.controller;
 
 import java.util.List;
@@ -8,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -90,5 +90,48 @@ public class DonorController {
             @RequestParam("typeName") String typeName) {
 
         return donorService.getDonorsByDonationType(typeName);
+    }
+
+    // D3: Add a donation type to a donor
+    @PutMapping("/{donorId}/donation-types/{donationTypeId}")
+    public ResponseEntity<String> addDonationTypeToDonor(
+            @PathVariable UUID donorId,
+            @PathVariable UUID donationTypeId) {
+
+        String message = donorService.addDonationTypeToDonor(
+                donorId, donationTypeId);
+
+        if (message.equals("The donor with that id does not exist")
+                || message.equals("The donation type with that id does not exist")) {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+        }
+
+        if (message.equals("Donor already has this donation type")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+        }
+
+        return ResponseEntity.ok(message);
+    }
+
+    // D4: Change a donor's donation slot
+    @PatchMapping("/{donorId}/donation-slot")
+    public ResponseEntity<String> changeDonationSlot(
+            @PathVariable UUID donorId,
+            @RequestParam int slotNumber) {
+
+        String message = donorService.changeDonationSlot(donorId, slotNumber);
+
+        if (message.equals("The donor with that id does not exist")
+                || message.equals("The donation slot with that number does not exist")) {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+        }
+
+        if (message.equals("The donation slot is already taken")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+        }
+
+        return ResponseEntity.ok(message);
     }
 }

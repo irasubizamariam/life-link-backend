@@ -39,14 +39,28 @@ public class BloodRequestController {
         this.donorService = donorService;
     }
 
+    // D1: Save blood request with validation
     @PostMapping("/save")
     public ResponseEntity<?> saveBloodRequest(
             @RequestBody BloodRequest bloodRequest) {
 
-        bloodRequestService.saveBloodRequest(bloodRequest);
+        String result =
+                bloodRequestService.saveBloodRequest(bloodRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Blood request saved successfully");
+        if (result.equals("Blood request date cannot be in the past")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(result);
+
+        } else if (result.equals(
+                "Donor is already matched to a request on that date")) {
+
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(result);
+
+        } else {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(result);
+        }
     }
 
     @GetMapping("/all")
@@ -55,7 +69,8 @@ public class BloodRequestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBloodRequestById(@PathVariable UUID id) {
+    public ResponseEntity<?> getBloodRequestById(
+            @PathVariable UUID id) {
 
         return bloodRequestService.getBloodRequestById(id)
                 .map(request -> ResponseEntity.ok((Object) request))
@@ -74,17 +89,29 @@ public class BloodRequestController {
                 .body("The blood request with that id does not exist"));
     }
 
+    // E3: Delete a blood request
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteBloodRequest(@PathVariable UUID id) {
+    public ResponseEntity<String> deleteBloodRequest(
+            @PathVariable UUID id) {
 
-        if (bloodRequestService.deleteBloodRequest(id)) {
-            return ResponseEntity.ok("Blood request deleted successfully");
+        String message = bloodRequestService.deleteBloodRequest(id);
+
+        if (message.equals(
+                "The blood request with that id does not exist")) {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("The blood request with that id does not exist");
+        if (message.equals(
+                "That blood request has donation records, delete them first")) {
+
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+        }
+
+        return ResponseEntity.ok(message);
     }
 
+    // B2
     @GetMapping("/by-status")
     public List<BloodRequest> getBloodRequestsByStatus(
             @RequestParam RequestStatus status) {
@@ -92,14 +119,17 @@ public class BloodRequestController {
         return bloodRequestService.getBloodRequestsByStatus(status);
     }
 
+    // B3
     @GetMapping("/between")
     public List<BloodRequest> getBloodRequestsBetweenDates(
             @RequestParam LocalDate start,
             @RequestParam LocalDate end) {
 
-        return bloodRequestService.getBloodRequestsBetweenDates(start, end);
+        return bloodRequestService
+                .getBloodRequestsBetweenDates(start, end);
     }
 
+    // C4
     @GetMapping("/recipients-by-donor/{donorId}")
     public ResponseEntity<?> getRecipientsByDonorId(
             @PathVariable UUID donorId) {
@@ -115,6 +145,7 @@ public class BloodRequestController {
         return ResponseEntity.ok(recipients);
     }
 
+    // D2
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> changeBloodRequestStatus(
             @PathVariable UUID id,
@@ -123,14 +154,38 @@ public class BloodRequestController {
         String result =
                 bloodRequestService.changeBloodRequestStatus(id, status);
 
-        if (result.equals("The blood request with that id does not exist")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        if (result.equals(
+                "The blood request with that id does not exist")) {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(result);
 
         } else if (result.startsWith("Cannot change status")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(result);
 
         } else {
             return ResponseEntity.ok(result);
         }
+    }
+
+    // F1: Get blood request statistics by status
+    @GetMapping("/stats/by-status")
+    public List<Object[]> getRequestStatistics() {
+        return bloodRequestService.getRequestStatistics();
+    }
+
+    // F2: Cancel requests for a donor on a particular date
+    @PatchMapping("/cancel-day")
+    public ResponseEntity<String> cancelRequestsByDonorAndDate(
+            @RequestParam UUID donorId,
+            @RequestParam LocalDate date) {
+
+        String result =
+                bloodRequestService.cancelRequestsByDonorAndDate(
+                        donorId, date);
+
+        return ResponseEntity.ok(result);
     }
 }
