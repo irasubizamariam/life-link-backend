@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-LifelinkApplication<lifelink>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.lifelink.LifelinkApplication",
+            "projectName": "lifelink",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
