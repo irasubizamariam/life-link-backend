@@ -1,3 +1,4 @@
+
 package com.lifelink.service;
 
 import java.util.List;
@@ -18,29 +19,33 @@ public class DonationSlotService {
         this.donationSlotRepository = donationSlotRepository;
     }
 
+    // Save a donation slot
     public String saveDonationSlot(DonationSlot donationSlot) {
         donationSlotRepository.save(donationSlot);
         return "Donation slot saved successfully";
     }
 
+    // Get all donation slots
     public List<DonationSlot> getAllDonationSlots() {
         return donationSlotRepository.findAll();
     }
 
+    // Get one donation slot by ID
     public Optional<DonationSlot> getDonationSlotById(UUID id) {
         return donationSlotRepository.findById(id);
     }
 
+    // Update a donation slot
     public String updateDonationSlot(UUID id, DonationSlot newDonationSlot) {
 
-        Optional<DonationSlot> existing =
+        Optional<DonationSlot> existingSlot =
                 donationSlotRepository.findById(id);
 
-        if (existing.isEmpty()) {
+        if (existingSlot.isEmpty()) {
             return "The donation slot with that id does not exist";
         }
 
-        DonationSlot donationSlot = existing.get();
+        DonationSlot donationSlot = existingSlot.get();
 
         donationSlot.setSlotNumber(newDonationSlot.getSlotNumber());
         donationSlot.setName(newDonationSlot.getName());
@@ -50,6 +55,7 @@ public class DonationSlotService {
         return "Donation slot updated successfully";
     }
 
+    // Delete a donation slot
     public String deleteDonationSlot(UUID id) {
 
         if (!donationSlotRepository.existsById(id)) {
@@ -59,5 +65,10 @@ public class DonationSlotService {
         donationSlotRepository.deleteById(id);
 
         return "Donation slot deleted successfully";
+    }
+
+    // C2: Get free donation slots
+    public List<DonationSlot> getFreeDonationSlots() {
+        return donationSlotRepository.findFreeDonationSlots();
     }
 }

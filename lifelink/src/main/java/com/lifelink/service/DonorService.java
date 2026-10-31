@@ -1,3 +1,4 @@
+
 package com.lifelink.service;
 
 import java.util.List;
@@ -18,19 +19,23 @@ public class DonorService {
         this.donorRepository = donorRepository;
     }
 
+    // Save a donor
     public String saveDonor(Donor donor) {
         donorRepository.save(donor);
         return "Donor saved successfully";
     }
 
+    // Get all donors
     public List<Donor> getAllDonors() {
         return donorRepository.findAll();
     }
 
+    // Get one donor by ID
     public Optional<Donor> getDonorById(UUID id) {
         return donorRepository.findById(id);
     }
 
+    // Update a donor
     public String updateDonor(UUID id, Donor newDonor) {
 
         Optional<Donor> existingDonor = donorRepository.findById(id);
@@ -53,6 +58,7 @@ public class DonorService {
         return "Donor updated successfully";
     }
 
+    // Delete a donor
     public String deleteDonor(UUID id) {
 
         if (!donorRepository.existsById(id)) {
@@ -62,5 +68,10 @@ public class DonorService {
         donorRepository.deleteById(id);
 
         return "Donor deleted successfully";
+    }
+
+    // C1: Find donors by donation type
+    public List<Donor> getDonorsByDonationType(String typeName) {
+        return donorRepository.findDonorsByDonationType(typeName);
     }
 }

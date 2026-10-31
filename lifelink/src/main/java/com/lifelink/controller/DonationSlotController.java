@@ -1,3 +1,4 @@
+
 package com.lifelink.controller;
 
 import java.util.List;
@@ -27,21 +28,26 @@ public class DonationSlotController {
         this.donationSlotService = donationSlotService;
     }
 
+    // Save a donation slot
     @PostMapping("/save")
     public ResponseEntity<String> saveDonationSlot(
             @RequestBody DonationSlot donationSlot) {
 
         String message = donationSlotService.saveDonationSlot(donationSlot);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
+    // Get all donation slots
     @GetMapping("/all")
     public List<DonationSlot> getAllDonationSlots() {
         return donationSlotService.getAllDonationSlots();
     }
 
+    // Get one donation slot by ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getDonationSlotById(@PathVariable UUID id) {
+
         var donationSlot = donationSlotService.getDonationSlotById(id);
 
         if (donationSlot.isEmpty()) {
@@ -52,12 +58,14 @@ public class DonationSlotController {
         return ResponseEntity.ok(donationSlot.get());
     }
 
+    // Update a donation slot
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateDonationSlot(
             @PathVariable UUID id,
             @RequestBody DonationSlot donationSlot) {
 
-        String message = donationSlotService.updateDonationSlot(id, donationSlot);
+        String message =
+                donationSlotService.updateDonationSlot(id, donationSlot);
 
         if (message.equals("The donation slot with that id does not exist")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
@@ -66,8 +74,10 @@ public class DonationSlotController {
         return ResponseEntity.ok(message);
     }
 
+    // Delete a donation slot
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteDonationSlot(@PathVariable UUID id) {
+
         String message = donationSlotService.deleteDonationSlot(id);
 
         if (message.equals("The donation slot with that id does not exist")) {
@@ -75,5 +85,11 @@ public class DonationSlotController {
         }
 
         return ResponseEntity.ok(message);
+    }
+
+    // C2: Get free donation slots
+    @GetMapping("/free")
+    public List<DonationSlot> getFreeDonationSlots() {
+        return donationSlotService.getFreeDonationSlots();
     }
 }

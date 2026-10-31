@@ -1,3 +1,4 @@
+
 package com.lifelink.controller;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lifelink.entity.Recipient;
@@ -27,17 +29,20 @@ public class RecipientController {
         this.recipientService = recipientService;
     }
 
+    // Save a new recipient
     @PostMapping("/save")
     public ResponseEntity<String> saveRecipient(@RequestBody Recipient recipient) {
         String message = recipientService.saveRecipient(recipient);
         return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
+    // Get all recipients
     @GetMapping("/all")
     public List<Recipient> getAllRecipients() {
         return recipientService.getAllRecipients();
     }
 
+    // Get one recipient by ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getRecipientById(@PathVariable UUID id) {
         var recipient = recipientService.getRecipientById(id);
@@ -50,6 +55,7 @@ public class RecipientController {
         return ResponseEntity.ok(recipient.get());
     }
 
+    // Update a recipient
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateRecipient(
             @PathVariable UUID id,
@@ -64,6 +70,7 @@ public class RecipientController {
         return ResponseEntity.ok(message);
     }
 
+    // Delete a recipient
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteRecipient(@PathVariable UUID id) {
         String message = recipientService.deleteRecipient(id);
@@ -73,5 +80,13 @@ public class RecipientController {
         }
 
         return ResponseEntity.ok(message);
+    }
+
+    // B1: Find recipients by blood group and sort by last name
+    @GetMapping("/by-blood-group")
+    public List<Recipient> getRecipientsByBloodGroup(
+            @RequestParam("bloodGroup") String bloodGroup) {
+
+        return recipientService.getRecipientsByBloodGroup(bloodGroup);
     }
 }

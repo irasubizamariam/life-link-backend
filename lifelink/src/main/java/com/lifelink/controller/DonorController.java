@@ -1,3 +1,4 @@
+
 package com.lifelink.controller;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lifelink.entity.Donor;
@@ -27,19 +29,23 @@ public class DonorController {
         this.donorService = donorService;
     }
 
+    // Save a donor
     @PostMapping("/save")
     public ResponseEntity<String> saveDonor(@RequestBody Donor donor) {
         String message = donorService.saveDonor(donor);
         return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
+    // Get all donors
     @GetMapping("/all")
     public List<Donor> getAllDonors() {
         return donorService.getAllDonors();
     }
 
+    // Get one donor by ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getDonorById(@PathVariable UUID id) {
+
         var donor = donorService.getDonorById(id);
 
         if (donor.isEmpty()) {
@@ -50,6 +56,7 @@ public class DonorController {
         return ResponseEntity.ok(donor.get());
     }
 
+    // Update a donor
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateDonor(
             @PathVariable UUID id,
@@ -64,8 +71,10 @@ public class DonorController {
         return ResponseEntity.ok(message);
     }
 
+    // Delete a donor
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteDonor(@PathVariable UUID id) {
+
         String message = donorService.deleteDonor(id);
 
         if (message.equals("The donor with that id does not exist")) {
@@ -73,5 +82,13 @@ public class DonorController {
         }
 
         return ResponseEntity.ok(message);
+    }
+
+    // C1: Find donors by donation type
+    @GetMapping("/by-donation-type")
+    public List<Donor> getDonorsByDonationType(
+            @RequestParam("typeName") String typeName) {
+
+        return donorService.getDonorsByDonationType(typeName);
     }
 }

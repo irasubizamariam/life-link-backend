@@ -1,3 +1,4 @@
+
 package com.lifelink.service;
 
 import java.util.List;
@@ -67,5 +68,11 @@ public class RecipientService {
         recipientRepository.deleteById(id);
 
         return "Recipient deleted successfully";
+    }
+
+    // B1: Get recipients by blood group
+    public List<Recipient> getRecipientsByBloodGroup(String bloodGroup) {
+        return recipientRepository
+                .findByBloodGroupIgnoreCaseOrderByLastNameAsc(bloodGroup);
     }
 }

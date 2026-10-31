@@ -14,16 +14,16 @@ public class DonationSlot {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private int slotNumber;
-
     private String name;
+
+    private Integer slotNumber;
 
     public DonationSlot() {
     }
 
-    public DonationSlot(int slotNumber, String name) {
-        this.slotNumber = slotNumber;
+    public DonationSlot(String name, Integer slotNumber) {
         this.name = name;
+        this.slotNumber = slotNumber;
     }
 
     public UUID getId() {
@@ -34,19 +34,19 @@ public class DonationSlot {
         this.id = id;
     }
 
-    public int getSlotNumber() {
-        return slotNumber;
-    }
-
-    public void setSlotNumber(int slotNumber) {
-        this.slotNumber = slotNumber;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getSlotNumber() {
+        return slotNumber;
+    }
+
+    public void setSlotNumber(Integer slotNumber) {
+        this.slotNumber = slotNumber;
     }
 }
