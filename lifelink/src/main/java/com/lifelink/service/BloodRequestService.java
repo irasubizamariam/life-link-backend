@@ -22,9 +22,8 @@ public class BloodRequestService {
         this.bloodRequestRepository = bloodRequestRepository;
     }
 
-    public String saveBloodRequest(BloodRequest bloodRequest) {
-        bloodRequestRepository.save(bloodRequest);
-        return "Blood request saved successfully";
+    public BloodRequest saveBloodRequest(BloodRequest bloodRequest) {
+        return bloodRequestRepository.save(bloodRequest);
     }
 
     public List<BloodRequest> getAllBloodRequests() {
@@ -35,49 +34,83 @@ public class BloodRequestService {
         return bloodRequestRepository.findById(id);
     }
 
-    public String updateBloodRequest(UUID id, BloodRequest newBloodRequest) {
+    public Optional<BloodRequest> updateBloodRequest(UUID id, BloodRequest newRequest) {
         Optional<BloodRequest> existingRequest =
                 bloodRequestRepository.findById(id);
 
-        if (existingRequest.isEmpty()) {
-            return "The blood request with that id does not exist";
+        if (existingRequest.isPresent()) {
+            BloodRequest request = existingRequest.get();
+
+            request.setRequestDate(newRequest.getRequestDate());
+            request.setBloodGroupNeeded(newRequest.getBloodGroupNeeded());
+            request.setUnitsNeeded(newRequest.getUnitsNeeded());
+            request.setRecipient(newRequest.getRecipient());
+            request.setDonor(newRequest.getDonor());
+
+            return Optional.of(bloodRequestRepository.save(request));
         }
 
-        BloodRequest bloodRequest = existingRequest.get();
-
-        bloodRequest.setRequestDate(newBloodRequest.getRequestDate());
-        bloodRequest.setBloodGroupNeeded(newBloodRequest.getBloodGroupNeeded());
-        bloodRequest.setUnitsNeeded(newBloodRequest.getUnitsNeeded());
-        bloodRequest.setRecipient(newBloodRequest.getRecipient());
-        bloodRequest.setDonor(newBloodRequest.getDonor());
-
-        bloodRequestRepository.save(bloodRequest);
-        return "Blood request updated successfully";
+        return Optional.empty();
     }
 
-    public String deleteBloodRequest(UUID id) {
-        if (!bloodRequestRepository.existsById(id)) {
-            return "The blood request with that id does not exist";
+    public boolean deleteBloodRequest(UUID id) {
+        Optional<BloodRequest> request =
+                bloodRequestRepository.findById(id);
+
+        if (request.isPresent()) {
+            bloodRequestRepository.delete(request.get());
+            return true;
         }
 
-        bloodRequestRepository.deleteById(id);
-        return "Blood request deleted successfully";
+        return false;
     }
 
-    // B2
-    public List<BloodRequest> getRequestsByStatus(RequestStatus status) {
+    public List<BloodRequest> getBloodRequestsByStatus(RequestStatus status) {
         return bloodRequestRepository.findByStatusOrderByRequestDateAsc(status);
     }
 
-    // B3
-    public List<BloodRequest> getRequestsBetweenDates(
+    public List<BloodRequest> getBloodRequestsBetweenDates(
             LocalDate start, LocalDate end) {
+
         return bloodRequestRepository
                 .findByRequestDateBetweenOrderByRequestDateAsc(start, end);
     }
 
-    // C4
     public List<Recipient> getRecipientsByDonorId(UUID donorId) {
         return bloodRequestRepository.findRecipientsByDonorId(donorId);
+    }
+
+    public String changeBloodRequestStatus(UUID id, RequestStatus newStatus) {
+
+        Optional<BloodRequest> optionalRequest =
+                bloodRequestRepository.findById(id);
+
+        if (optionalRequest.isEmpty()) {
+            return "The blood request with that id does not exist";
+        }
+
+        BloodRequest request = optionalRequest.get();
+        RequestStatus currentStatus = request.getStatus();
+
+        boolean allowed = false;
+
+        if (currentStatus == RequestStatus.OPEN) {
+            allowed = newStatus == RequestStatus.MATCHED
+                    || newStatus == RequestStatus.DECLINED;
+
+        } else if (currentStatus == RequestStatus.MATCHED) {
+            allowed = newStatus == RequestStatus.DONATED
+                    || newStatus == RequestStatus.DECLINED;
+        }
+
+        if (!allowed) {
+            return "Cannot change status from " + currentStatus
+                    + " to " + newStatus;
+        }
+
+        request.setStatus(newStatus);
+        bloodRequestRepository.save(request);
+
+        return "Blood request status updated successfully";
     }
 }

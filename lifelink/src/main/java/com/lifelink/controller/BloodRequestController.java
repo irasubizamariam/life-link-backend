@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,15 +34,19 @@ public class BloodRequestController {
     public BloodRequestController(
             BloodRequestService bloodRequestService,
             DonorService donorService) {
+
         this.bloodRequestService = bloodRequestService;
         this.donorService = donorService;
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> saveBloodRequest(
+    public ResponseEntity<?> saveBloodRequest(
             @RequestBody BloodRequest bloodRequest) {
-        String message = bloodRequestService.saveBloodRequest(bloodRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(message);
+
+        bloodRequestService.saveBloodRequest(bloodRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Blood request saved successfully");
     }
 
     @GetMapping("/all")
@@ -51,65 +56,55 @@ public class BloodRequestController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getBloodRequestById(@PathVariable UUID id) {
-        var bloodRequest = bloodRequestService.getBloodRequestById(id);
 
-        if (bloodRequest.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("The blood request with that id does not exist");
-        }
-
-        return ResponseEntity.ok(bloodRequest.get());
+        return bloodRequestService.getBloodRequestById(id)
+                .map(request -> ResponseEntity.ok((Object) request))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("The blood request with that id does not exist"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateBloodRequest(
+    public ResponseEntity<?> updateBloodRequest(
             @PathVariable UUID id,
             @RequestBody BloodRequest bloodRequest) {
-        String message =
-                bloodRequestService.updateBloodRequest(id, bloodRequest);
 
-        if (message.equals("The blood request with that id does not exist")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
-        }
-
-        return ResponseEntity.ok(message);
+        return bloodRequestService.updateBloodRequest(id, bloodRequest)
+                .map(request -> ResponseEntity.ok((Object) request))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("The blood request with that id does not exist"));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteBloodRequest(@PathVariable UUID id) {
-        String message = bloodRequestService.deleteBloodRequest(id);
+    public ResponseEntity<?> deleteBloodRequest(@PathVariable UUID id) {
 
-        if (message.equals("The blood request with that id does not exist")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+        if (bloodRequestService.deleteBloodRequest(id)) {
+            return ResponseEntity.ok("Blood request deleted successfully");
         }
 
-        return ResponseEntity.ok(message);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("The blood request with that id does not exist");
     }
 
-    // B2
     @GetMapping("/by-status")
-    public List<BloodRequest> getRequestsByStatus(
-            @RequestParam("status") RequestStatus status) {
-        return bloodRequestService.getRequestsByStatus(status);
+    public List<BloodRequest> getBloodRequestsByStatus(
+            @RequestParam RequestStatus status) {
+
+        return bloodRequestService.getBloodRequestsByStatus(status);
     }
 
-    // B3
     @GetMapping("/between")
-    public List<BloodRequest> getRequestsBetweenDates(
-            @RequestParam("start") String start,
-            @RequestParam("end") String end) {
-        LocalDate startDate = LocalDate.parse(start);
-        LocalDate endDate = LocalDate.parse(end);
+    public List<BloodRequest> getBloodRequestsBetweenDates(
+            @RequestParam LocalDate start,
+            @RequestParam LocalDate end) {
 
-        return bloodRequestService.getRequestsBetweenDates(startDate, endDate);
+        return bloodRequestService.getBloodRequestsBetweenDates(start, end);
     }
 
-    // C4
     @GetMapping("/recipients-by-donor/{donorId}")
     public ResponseEntity<?> getRecipientsByDonorId(
             @PathVariable UUID donorId) {
 
-        if (donorService.getDonorById(donorId).isEmpty()) {
+        if (!donorService.getDonorById(donorId).isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("The donor with that id does not exist");
         }
@@ -118,5 +113,24 @@ public class BloodRequestController {
                 bloodRequestService.getRecipientsByDonorId(donorId);
 
         return ResponseEntity.ok(recipients);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> changeBloodRequestStatus(
+            @PathVariable UUID id,
+            @RequestParam RequestStatus status) {
+
+        String result =
+                bloodRequestService.changeBloodRequestStatus(id, status);
+
+        if (result.equals("The blood request with that id does not exist")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+
+        } else if (result.startsWith("Cannot change status")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+
+        } else {
+            return ResponseEntity.ok(result);
+        }
     }
 }
