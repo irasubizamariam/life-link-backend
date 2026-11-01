@@ -32,6 +32,10 @@ public class BloodRequestService {
     // D1: Validate and save a blood request
     public String saveBloodRequest(BloodRequest bloodRequest) {
 
+        if (bloodRequest.getRequestDate() == null) {
+            return "Blood request date is required";
+        }
+
         if (bloodRequest.getRequestDate().isBefore(LocalDate.now())) {
             return "Blood request date cannot be in the past";
         }
@@ -157,12 +161,12 @@ public class BloodRequestService {
         return "Blood request status updated successfully";
     }
 
-    // F1: Count blood requests by status
+    // F1
     public List<Object[]> getRequestStatistics() {
         return bloodRequestRepository.countRequestsByStatus();
     }
 
-    // F2: Cancel requests for one donor on one date
+    // F2
     @Transactional
     public String cancelRequestsByDonorAndDate(
             UUID donorId, LocalDate date) {

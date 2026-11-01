@@ -12,9 +12,9 @@ import com.lifelink.entity.Donor;
 
 public interface DonorRepository extends JpaRepository<Donor, UUID> {
 
-    // C1: Find donors by donation type, ignoring uppercase and lowercase
+    // C1: Find donors by donation type using partial and case-insensitive matching
     @Query("SELECT DISTINCT d FROM Donor d JOIN d.donationTypes dt " +
-           "WHERE LOWER(dt.name) = LOWER(:typeName)")
-    List<Donor> findDonorsByDonationType(
-            @Param("typeName") String typeName);
+           "WHERE LOWER(dt.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<Donor> findDonorsByDonationType(@Param("name") String name);
+
 }

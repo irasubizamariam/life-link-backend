@@ -1,0 +1,184 @@
+{
+  "info": {
+    "_postman_id": "6da3f648-ba6a-47d6-b0fa-1ad46dabcb2f",
+    "name": "Lifelink API Testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58441727",
+    "_collection_link": "https://go.postman.co/collection/58441727-6da3f648-ba6a-47d6-b0fa-1ad46dabcb2f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Recipients",
+      "item": [
+        {
+          "name": "Donors",
+          "item": [
+            {
+              "name": "Blood Request",
+              "item": [
+                {
+                  "name": "Donation Types",
+                  "item": [
+                    {
+                      "name": "Donation Slots",
+                      "item": [
+                        {
+                          "name": "C1 – Find Donors by Donation Type",
+                          "request": {
+                            "method": "GET",
+                            "header": [],
+                            "url": {
+                              "raw": "http://localhost:8080/api/donors/by-donation-type?typeName=Plasma",
+                              "protocol": "http",
+                              "host": [
+                                "localhost"
+                              ],
+                              "port": "8080",
+                              "path": [
+                                "api",
+                                "donors",
+                                "by-donation-type"
+                              ],
+                              "query": [
+                                {
+                                  "key": "typeName",
+                                  "value": "Plasma"
+                                }
+                              ]
+                            }
+                          },
+                          "response": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "D3 – Add Donation Types to a Donor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "C2 – Find free donation slots.",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "C3 – Find unused donation types.",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "C4 – Find recipients for a particular donor",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "D1 – Date validation, duplicate prevention and automatic OPEN status.",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "D2 – Valid blood request status transitions.",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "D4: Assign a donor to a free donation slot.",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "E1: Save a donation record.",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "E2: Find donation records using a recipient's file number.",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "F1: Count blood requests according to their status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "F2: Cancel all requests belonging to a particular donor",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    }
+  ]
+}

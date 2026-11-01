@@ -1,3 +1,4 @@
+
 package com.lifelink.controller;
 
 import java.util.List;
@@ -84,12 +85,12 @@ public class DonorController {
         return ResponseEntity.ok(message);
     }
 
-    // C1: Find donors by donation type
+    // C1: Find donors by partial donation type name
     @GetMapping("/by-donation-type")
     public List<Donor> getDonorsByDonationType(
-            @RequestParam("typeName") String typeName) {
+            @RequestParam("name") String name) {
 
-        return donorService.getDonorsByDonationType(typeName);
+        return donorService.getDonorsByDonationType(name);
     }
 
     // D3: Add a donation type to a donor

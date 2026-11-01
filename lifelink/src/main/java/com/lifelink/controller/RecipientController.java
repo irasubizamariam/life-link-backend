@@ -45,6 +45,7 @@ public class RecipientController {
     // Get one recipient by ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getRecipientById(@PathVariable UUID id) {
+
         var recipient = recipientService.getRecipientById(id);
 
         if (recipient.isEmpty()) {
@@ -73,6 +74,7 @@ public class RecipientController {
     // Delete a recipient
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteRecipient(@PathVariable UUID id) {
+
         String message = recipientService.deleteRecipient(id);
 
         if (message.equals("The recipient with that id does not exist")) {
@@ -88,5 +90,21 @@ public class RecipientController {
             @RequestParam("bloodGroup") String bloodGroup) {
 
         return recipientService.getRecipientsByBloodGroup(bloodGroup);
+    }
+
+    // C4: Find recipients connected to a particular donor
+    @GetMapping("/of-donor/{donorId}")
+    public ResponseEntity<?> getRecipientsByDonor(
+            @PathVariable UUID donorId) {
+
+        if (!recipientService.donorExists(donorId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("The donor with that id does not exist");
+        }
+
+        List<Recipient> recipients =
+                recipientService.getRecipientsByDonorId(donorId);
+
+        return ResponseEntity.ok(recipients);
     }
 }

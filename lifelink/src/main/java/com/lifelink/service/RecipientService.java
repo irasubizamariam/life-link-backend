@@ -8,15 +8,25 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.lifelink.entity.Recipient;
+import com.lifelink.repository.BloodRequestRepository;
+import com.lifelink.repository.DonorRepository;
 import com.lifelink.repository.RecipientRepository;
 
 @Service
 public class RecipientService {
 
     private final RecipientRepository recipientRepository;
+    private final DonorRepository donorRepository;
+    private final BloodRequestRepository bloodRequestRepository;
 
-    public RecipientService(RecipientRepository recipientRepository) {
+    public RecipientService(
+            RecipientRepository recipientRepository,
+            DonorRepository donorRepository,
+            BloodRequestRepository bloodRequestRepository) {
+
         this.recipientRepository = recipientRepository;
+        this.donorRepository = donorRepository;
+        this.bloodRequestRepository = bloodRequestRepository;
     }
 
     // Save recipient
@@ -74,5 +84,15 @@ public class RecipientService {
     public List<Recipient> getRecipientsByBloodGroup(String bloodGroup) {
         return recipientRepository
                 .findByBloodGroupIgnoreCaseOrderByLastNameAsc(bloodGroup);
+    }
+
+    // C4: Check whether a donor exists
+    public boolean donorExists(UUID donorId) {
+        return donorRepository.existsById(donorId);
+    }
+
+    // C4: Find distinct recipients connected to a donor's blood requests
+    public List<Recipient> getRecipientsByDonorId(UUID donorId) {
+        return bloodRequestRepository.findRecipientsByDonorId(donorId);
     }
 }
